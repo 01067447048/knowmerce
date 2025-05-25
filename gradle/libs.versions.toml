@@ -117,6 +117,16 @@ jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serializati
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigationCompose" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+
+multi-module-android-application = { id = "multi.module.android.application", version = "unspecified" }
+multi-module-android-application-compose = { id = "multi.module.android.application.compose", version = "unspecified" }
+multi-module-android-library = { id = "multi.module.android.library", version = "unspecified" }
+multi-module-android-library-compose = { id = "multi.module.android.library.compose", version = "unspecified" }
+multi-module-android-presentation-ui = { id = "multi.module.android.presentation.ui", version = "unspecified" }
+multi-module-android-hilt = { id = "multi.module.android.hilt", version = "unspecified" }
+multi-module-java-library = { id = "multi.module.java.library", version = "unspecified" }
+multi-module-featrue = { id = "multi.module.feature", version = "unspecified" }
 
 [bundles]
 compose = [

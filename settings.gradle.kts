@@ -1,5 +1,7 @@
 pluginManagement {
 
+    includeBuild("build-logic")
+
     repositories {
         google {
             content {
@@ -20,5 +22,16 @@ dependencyResolutionManagement {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "knowmerce"
 include(":app")
+include(":core:common")
+include(":core:data")
+include(":core:designsystem")
+include(":core:model")
+include(":core:local")
+include(":feature:search")
+include(":feature:saved_list")
+include(":core:network")
+include(":core:domain")

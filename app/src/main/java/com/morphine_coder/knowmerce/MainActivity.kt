@@ -11,7 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.morphine_coder.knowmerce.common.navigation.Navigator
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.morphine_coder.knowmerce.core.common.navigation.Navigator
+import com.morphine_coder.knowmerce.feature.search.SearchViewModel
 import com.morphine_coder.knowmerce.ui.theme.KnowmerceTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,6 +34,9 @@ class MainActivity : ComponentActivity() {
                         name = "Android",
                         modifier = Modifier.padding(innerPadding)
                     )
+
+                    val viewModel: SearchViewModel = hiltViewModel()
+                    viewModel.search("test")
                 }
             }
         }
