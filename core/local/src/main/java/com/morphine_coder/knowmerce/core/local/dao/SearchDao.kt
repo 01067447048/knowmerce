@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.morphine_coder.knowmerce.core.local.entity.SearchResultEntity
 import com.morphine_coder.knowmerce.core.local.entity.SearchResultWithFavorite
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Create by jaehyeon.
@@ -16,21 +17,19 @@ import com.morphine_coder.knowmerce.core.local.entity.SearchResultWithFavorite
 @Dao
 interface SearchDao {
 
-    @Transaction
     @Query(
         """
-        SELECT sr.*, 
-               CASE WHEN f.docUrl IS NOT NULL THEN 1 ELSE 0 END as isFavorite
-        FROM searching_result sr
-        LEFT JOIN favorites f ON sr.docUrl = f.docUrl
-        WHERE keyword = :keyword
-        ORDER BY page ASC
+    SELECT sr.*, 
+           CASE WHEN f.docUrl IS NOT NULL THEN 1 ELSE 0 END as isFavorite
+    FROM searching_result sr
+    INNER JOIN favorites f ON sr.docUrl = f.docUrl
+    ORDER BY sr.timestamp DESC
     """
     )
-    fun pagingSource(keyword: String): PagingSource<Int, SearchResultWithFavorite>
+    fun getAllFavorites(): Flow<List<SearchResultWithFavorite>>
 
     @Query("SELECT * FROM searching_result WHERE keyword = :keyword ORDER BY timestamp DESC")
-    fun pagingSource2(keyword: String): PagingSource<Int, SearchResultEntity>
+    fun pagingSource(keyword: String): PagingSource<Int, SearchResultEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(results: List<SearchResultEntity>)

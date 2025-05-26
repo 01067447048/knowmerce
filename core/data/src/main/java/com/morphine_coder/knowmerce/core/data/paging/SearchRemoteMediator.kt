@@ -39,7 +39,15 @@ class SearchRemoteMediator(
             LoadType.REFRESH -> 1
             LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             LoadType.APPEND -> {
-                nextPage ?: return MediatorResult.Success(endOfPaginationReached = true)
+                if (nextPage == null) {
+                    if (state.lastItemOrNull() == null) {
+                        2
+                    } else {
+                        state.lastItemOrNull()!!.page + 1
+                    }
+                } else {
+                    nextPage!!
+                }
             }
         }
 
@@ -57,6 +65,8 @@ class SearchRemoteMediator(
                 dao.clear(keyword)
             }
         }
+
+        Logg.e(keyword)
 
         return try {
             val (images, video) = coroutineScope {

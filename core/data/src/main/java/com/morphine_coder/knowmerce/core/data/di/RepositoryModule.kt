@@ -1,7 +1,9 @@
 package com.morphine_coder.knowmerce.core.data.di
 
 import com.morphine_coder.knowmerce.core.data.Service
+import com.morphine_coder.knowmerce.core.data.repository.FavoriteRepositoryImpl
 import com.morphine_coder.knowmerce.core.data.repository.SearchRepositoryImpl
+import com.morphine_coder.knowmerce.core.domain.model.repository.FavoriteRepository
 import com.morphine_coder.knowmerce.core.domain.model.repository.SearchRepository
 import com.morphine_coder.knowmerce.core.local.SearchDatabase
 import dagger.Module
@@ -27,4 +29,9 @@ object RepositoryModule {
         database, service
     )
 
+    @Provides
+    @Singleton
+    fun provideFavoriteRepository(
+        database: SearchDatabase
+    ): FavoriteRepository = FavoriteRepositoryImpl(database)
 }

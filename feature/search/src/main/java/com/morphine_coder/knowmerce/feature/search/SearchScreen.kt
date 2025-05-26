@@ -19,7 +19,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,11 +35,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.morphine_coder.knowmerce.core.designsystem.components.ImageCard
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
  * Create by jaehyeon.
  * Date: 2025. 5. 26.
  */
+@OptIn(FlowPreview::class)
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
@@ -42,7 +52,22 @@ fun SearchScreen(
 ) {
 
     val search = viewModel.search.collectAsLazyPagingItems()
-    val keyword by viewModel.keyword.collectAsStateWithLifecycle()
+    var keyword by remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(keyword) {
+        snapshotFlow { keyword }
+            .debounce(350L)
+            .distinctUntilChanged()
+            .collectLatest {
+                if (it.isNotEmpty()) {
+                    viewModel.search(it)
+                } else {
+                    viewModel.clearSearchResults()
+                }
+            }
+    }
 
     Column(
         modifier = Modifier
@@ -53,7 +78,9 @@ fun SearchScreen(
     ) {
         OutlinedTextField(
             value = keyword,
-            onValueChange = viewModel::onChangeKeyword,
+            onValueChange = {
+                keyword = it
+            },
             singleLine = true,
             textStyle = TextStyle(
                 fontSize = 16.sp,
@@ -106,6 +133,9 @@ fun SearchScreen(
                         imageUrl = it.imageUrl,
                         tileStamp = it.timestamp,
                         isSavedImage = it.isFavorite,
+                        onClick = {
+                            viewModel.toggleFavorite(it)
+                        }
                     )
                 }
             }

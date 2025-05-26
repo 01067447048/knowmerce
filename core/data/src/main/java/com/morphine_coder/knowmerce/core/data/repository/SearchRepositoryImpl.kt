@@ -30,7 +30,7 @@ class SearchRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalPagingApi::class)
     override fun search(keyword: String): Flow<PagingData<SearchResult>> {
         val pagingSourceFactory = {
-            database.searchDao().pagingSource2(keyword)
+            database.searchDao().pagingSource(keyword)
         }
 
         return Pager(
