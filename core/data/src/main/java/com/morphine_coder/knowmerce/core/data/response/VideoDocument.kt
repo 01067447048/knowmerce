@@ -20,12 +20,6 @@ data class VideoDocument(
     val url: String
 )
 
-fun VideoDocument.toSearchingResult(): SearchResult {
-    return SearchResult(
-        imageUrl = thumbnail,
-        timestamp = datetime
-    )
-}
 
 fun VideoDocument.toSearchResultEntity(keyword: String, page: Int): SearchResultEntity {
     return SearchResultEntity(
@@ -34,5 +28,6 @@ fun VideoDocument.toSearchResultEntity(keyword: String, page: Int): SearchResult
         imageUrl = thumbnail,
         timestamp = datetime,
         cachedAt = System.currentTimeMillis(),
+        docUrl = url
     )
 }

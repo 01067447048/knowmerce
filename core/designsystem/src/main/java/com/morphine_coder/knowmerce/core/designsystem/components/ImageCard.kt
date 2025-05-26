@@ -1,6 +1,7 @@
 package com.morphine_coder.knowmerce.core.designsystem.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,7 +40,8 @@ fun ImageCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp),
+            .height(200.dp)
+            .clickable { onClick.invoke() },
         shape = RoundedCornerShape(12.dp),
         colors = CardColors(
             contentColor = Color.White,

@@ -24,12 +24,6 @@ data class ImageDocument(
     val width: Int
 )
 
-fun ImageDocument.toSearchingResult(): SearchResult {
-    return SearchResult(
-        imageUrl = thumbnailUrl,
-        timestamp = datetime
-    )
-}
 
 fun ImageDocument.toSearchResultEntity(keyword: String, page: Int): SearchResultEntity {
     return SearchResultEntity(
@@ -37,6 +31,7 @@ fun ImageDocument.toSearchResultEntity(keyword: String, page: Int): SearchResult
         page = page,
         imageUrl = thumbnailUrl,
         timestamp = datetime,
-        cachedAt = System.currentTimeMillis()
+        cachedAt = System.currentTimeMillis(),
+        docUrl = docUrl
     )
 }

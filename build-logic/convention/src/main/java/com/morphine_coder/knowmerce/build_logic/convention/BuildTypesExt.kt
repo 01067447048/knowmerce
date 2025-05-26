@@ -59,15 +59,15 @@ internal fun Project.configureBuildTypes(
 }
 
 private fun BuildType.configureDebugBuildType() {
-    buildConfigField("String", "KAKAO_KEY", "\"6791f94c00a387459577d49165d512ad\"")
-    buildConfigField("String", "BASE_URL", "\"https://dapi.kakao.com/v2/search/\"")
+    buildConfigField("String", "KAKAO_KEY", "\"7b0d4c2078f68def627090db21dc7daa\"")
+    buildConfigField("String", "BASE_URL", "\"https://dapi.kakao.com/\"")
 }
 
 private fun BuildType.configureReleaseBuildType(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
-    buildConfigField("String", "KAKAO_KEY", "\"6791f94c00a387459577d49165d512ad\"")
-    buildConfigField("String", "BASE_URL", "\"https://dapi.kakao.com/v2/search/\"")
+    buildConfigField("String", "KAKAO_KEY", "\"7b0d4c2078f68def627090db21dc7daa\"")
+    buildConfigField("String", "BASE_URL", "\"https://dapi.kakao.com/\"")
 
     isMinifyEnabled = true
     proguardFiles(

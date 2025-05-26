@@ -9,6 +9,9 @@ import com.morphine_coder.knowmerce.core.data.Service
 import com.morphine_coder.knowmerce.core.data.paging.SearchRemoteMediator
 import com.morphine_coder.knowmerce.core.domain.model.repository.SearchRepository
 import com.morphine_coder.knowmerce.core.local.SearchDatabase
+import com.morphine_coder.knowmerce.core.local.dao.FavoritesDao
+import com.morphine_coder.knowmerce.core.local.entity.SearchResultEntity
+import com.morphine_coder.knowmerce.core.local.entity.SearchResultWithFavorite
 import com.morphine_coder.knowmerce.core.local.entity.toModel
 import com.morphine_coder.knowmerce.core.model.SearchResult
 import kotlinx.coroutines.flow.Flow
@@ -27,19 +30,32 @@ class SearchRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalPagingApi::class)
     override fun search(keyword: String): Flow<PagingData<SearchResult>> {
         val pagingSourceFactory = {
-            database.searchDao().pagingSource(keyword)
+            database.searchDao().pagingSource2(keyword)
         }
 
         return Pager(
-            config = PagingConfig(pageSize = 30),
+            config = PagingConfig(pageSize = 20),
             remoteMediator = SearchRemoteMediator(
                 keyword = keyword,
                 database = database,
                 service = service
             ),
             pagingSourceFactory = pagingSourceFactory
-        ).flow.map { pagingData ->
-            pagingData.map { it.toModel() }
+        ).flow.map { entity ->
+            entity.map {
+                it.toModelWithFavorite(database.favoriteDao())
+            }
         }
+
     }
+}
+
+suspend fun SearchResultEntity.toModelWithFavorite(favoritesDao: FavoritesDao): SearchResult {
+    val isFavorite = favoritesDao.isFavorite(this.docUrl)
+    return SearchResult(
+        docUrl = docUrl,
+        isFavorite = isFavorite,
+        imageUrl = imageUrl,
+        timestamp = timestamp,
+    )
 }

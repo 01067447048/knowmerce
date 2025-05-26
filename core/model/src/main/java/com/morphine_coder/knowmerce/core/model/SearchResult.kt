@@ -6,5 +6,7 @@ package com.morphine_coder.knowmerce.core.model
  */
 data class SearchResult(
     val imageUrl: String,
-    val timestamp: String
+    val timestamp: String,
+    val docUrl: String,
+    val isFavorite: Boolean
 )

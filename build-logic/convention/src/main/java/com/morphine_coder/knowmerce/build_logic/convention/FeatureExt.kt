@@ -18,4 +18,5 @@ fun DependencyHandlerScope.addFeatureDependencies(project: Project) {
     add("implementation", project(":core:common"))
     add("implementation", project(":core:domain"))
     add("implementation", project(":core:model"))
+    add("implementation", project(":core:designsystem"))
 }

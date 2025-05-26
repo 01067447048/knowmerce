@@ -5,7 +5,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.morphine_coder.knowmerce.core.local.entity.SearchResultEntity
+import com.morphine_coder.knowmerce.core.local.entity.SearchResultWithFavorite
 
 /**
  * Create by jaehyeon.
@@ -13,8 +15,22 @@ import com.morphine_coder.knowmerce.core.local.entity.SearchResultEntity
  */
 @Dao
 interface SearchDao {
-    @Query("SELECT * FROM searching_result WHERE keyword = :keyword ORDER BY page ASC")
-    fun pagingSource(keyword: String): PagingSource<Int, SearchResultEntity>
+
+    @Transaction
+    @Query(
+        """
+        SELECT sr.*, 
+               CASE WHEN f.docUrl IS NOT NULL THEN 1 ELSE 0 END as isFavorite
+        FROM searching_result sr
+        LEFT JOIN favorites f ON sr.docUrl = f.docUrl
+        WHERE keyword = :keyword
+        ORDER BY page ASC
+    """
+    )
+    fun pagingSource(keyword: String): PagingSource<Int, SearchResultWithFavorite>
+
+    @Query("SELECT * FROM searching_result WHERE keyword = :keyword ORDER BY timestamp DESC")
+    fun pagingSource2(keyword: String): PagingSource<Int, SearchResultEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(results: List<SearchResultEntity>)

@@ -15,13 +15,13 @@ interface Service {
     /**
      * 동영상 검색
      */
-    @GET("/vclip")
+    @GET("/v2/search/vclip")
     suspend fun getVideo(
         @Header("Authorization") token: String,
         @QueryMap map: HashMap<String, String>
     ): VideoResponse
 
-    @GET("/image")
+    @GET("/v2/search/image")
     suspend fun getImage(
         @Header("Authorization") token: String,
         @QueryMap map: HashMap<String, String>

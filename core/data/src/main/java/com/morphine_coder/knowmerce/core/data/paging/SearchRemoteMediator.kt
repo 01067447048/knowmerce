@@ -8,9 +8,11 @@ import com.monphine_coder.knowmerce.core.data.BuildConfig
 import com.morphine_coder.knowmerce.core.common.Logg
 import com.morphine_coder.knowmerce.core.data.Service
 import com.morphine_coder.knowmerce.core.data.response.toSearchResultEntity
-import com.morphine_coder.knowmerce.core.data.response.toSearchingResult
 import com.morphine_coder.knowmerce.core.local.SearchDatabase
 import com.morphine_coder.knowmerce.core.local.entity.SearchResultEntity
+import com.morphine_coder.knowmerce.core.local.entity.SearchResultWithFavorite
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 /**
  * Create by jaehyeon.
@@ -21,7 +23,9 @@ class SearchRemoteMediator(
     private val keyword: String,
     private val database: SearchDatabase,
     private val service: Service,
-): RemoteMediator<Int, SearchResultEntity>() {
+) : RemoteMediator<Int, SearchResultEntity>() {
+
+    private var nextPage: Int? = null
 
     companion object {
         private const val CACHED_TIME_THRESHOLD = 5 * 60 * 1000
@@ -35,10 +39,11 @@ class SearchRemoteMediator(
             LoadType.REFRESH -> 1
             LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             LoadType.APPEND -> {
-                val lastItem = state.lastItemOrNull() ?: return MediatorResult.Success(endOfPaginationReached = true)
-                lastItem.page + 1
+                nextPage ?: return MediatorResult.Success(endOfPaginationReached = true)
             }
         }
+
+        Logg.d("page : ${page}")
 
         val dao = database.searchDao()
 
@@ -47,40 +52,60 @@ class SearchRemoteMediator(
             val now = System.currentTimeMillis()
 
             if (now - lastCached <= CACHED_TIME_THRESHOLD) {
-                return MediatorResult.Success(endOfPaginationReached = false) // 캐시가 유효하면 네트워크 호출 생략
+                return MediatorResult.Success(endOfPaginationReached = false)
             } else {
-                dao.clear(keyword) // 만료된 캐시 삭제
+                dao.clear(keyword)
             }
         }
 
         return try {
-            val images = service.getImage(
-                token = "KakaoAK ${BuildConfig.KAKAO_KEY}",
-                map = hashMapOf(
-                    "query" to keyword,
-                    "page" to page.toString(),
-                    "size" to (state.config.pageSize / 2).toString()
-                )
-            ).documents.map {
-                it.toSearchResultEntity(keyword, page)
+            val (images, video) = coroutineScope {
+                val image = async {
+                    service.getImage(
+                        token = "KakaoAK ${BuildConfig.KAKAO_KEY}",
+                        map = hashMapOf(
+                            "query" to keyword,
+                            "page" to page.toString(),
+                            "size" to (state.config.pageSize).toString()
+                        )
+                    )
+                }
+
+                val video = async {
+                    service.getVideo(
+                        token = "KakaoAK ${BuildConfig.KAKAO_KEY}",
+                        map = hashMapOf(
+                            "query" to keyword,
+                            "page" to page.toString(),
+                            "size" to (state.config.pageSize).toString()
+                        )
+                    )
+                }
+
+                image.await() to video.await()
             }
 
-            val video = service.getVideo(
-                token = "KakaoAK ${BuildConfig.KAKAO_KEY}",
-                map = hashMapOf(
-                    "query" to keyword,
-                    "page" to page.toString(),
-                    "size" to (state.config.pageSize / 2).toString()
+            val entities = (images.documents.map {
+                it.toSearchResultEntity(
+                    keyword,
+                    page
                 )
-            ).documents.map {
-                it.toSearchResultEntity(keyword, page)
-            }
+            } + video.documents.map {
+                it.toSearchResultEntity(
+                    keyword,
+                    page
+                )
+            }).sortedByDescending { it.timestamp }
 
-            val entities = (images + video).sortedBy { it.timestamp }
+
+            Logg.d("${images.meta.isEnd} , ${video.meta.isEnd}")
+            val endOfPaginationReached = images.meta.isEnd || video.meta.isEnd
+
+            nextPage = if (endOfPaginationReached) null else page + 1
 
             dao.insertAll(entities)
 
-            MediatorResult.Success(endOfPaginationReached = images.isEmpty() && video.isEmpty())
+            MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
         } catch (e: Exception) {
             Logg.e(e)
             MediatorResult.Error(e)

@@ -9,22 +9,8 @@ import com.morphine_coder.knowmerce.core.model.SearchResult
  * Create by jaehyeon.
  * Date: 2025. 5. 23.
  */
-@Entity
+@Entity(tableName = "favorites")
 data class FavoriteEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-    @ColumnInfo(name = "thumbnail")
-    val thumbnail: String,
-    @ColumnInfo(name = "time_stamp")
-    val timeStamp: String
-)
-
-fun FavoriteEntity.toModel() = SearchResult(
-    imageUrl = thumbnail,
-    timestamp = timeStamp
-)
-
-fun SearchResult.toEntity() = FavoriteEntity(
-    thumbnail = imageUrl,
-    timeStamp = timestamp
+    @PrimaryKey
+    val docUrl: String
 )
