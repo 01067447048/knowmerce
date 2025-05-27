@@ -6,6 +6,8 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.morphine_coder.knowmerce.core.common.Logg
+import com.morphine_coder.knowmerce.core.common.navigation.Destination
+import com.morphine_coder.knowmerce.core.common.navigation.Navigator
 import com.morphine_coder.knowmerce.core.domain.model.use_case.SearchUseCase
 import com.morphine_coder.knowmerce.core.domain.model.use_case.ToggleFavoriteUseCase
 import com.morphine_coder.knowmerce.core.model.SearchResult
@@ -32,7 +34,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchUseCase: SearchUseCase,
-    private val toggleFavoriteUseCase: ToggleFavoriteUseCase
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val navigator: Navigator
 ): ViewModel() {
 
     private var searchJob: Job? = null
@@ -72,5 +75,18 @@ class SearchViewModel @Inject constructor(
         currentKeyword = null
         searchJob?.cancel()
         _search.value = PagingData.empty()
+    }
+
+    fun navigateToFavorite() {
+        viewModelScope.launch {
+            navigator.navigate(
+                destination = Destination.FavoriteRoute,
+                navOptions = {
+                    popUpTo(Destination.SearchRoute) {
+                        saveState = true
+                    }
+                }
+            )
+        }
     }
 }

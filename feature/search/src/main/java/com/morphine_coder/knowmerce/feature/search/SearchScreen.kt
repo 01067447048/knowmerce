@@ -9,14 +9,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,74 +75,98 @@ fun SearchScreen(
             }
     }
 
-    Column(
+    Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.White),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = keyword,
-            onValueChange = {
-                keyword = it
-            },
-            singleLine = true,
-            textStyle = TextStyle(
-                fontSize = 16.sp,
-                color = Color.Black
-            ),
-            shape = RoundedCornerShape(
-                corner = CornerSize(8.dp)
-            ),
-            trailingIcon = {
+            .fillMaxSize(),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    viewModel.navigateToFavorite()
+                },
+                modifier = Modifier
+                    .padding(4.dp),
+                containerColor = Color.LightGray,
+                contentColor = Color.Black,
+                shape = CircleShape
+            ) {
                 Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search Icon",
-                    tint = Color.LightGray,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            viewModel
-                        }
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Favorite Icon",
+                    tint = Color.Yellow,
                 )
-            },
-            label = {
-                Text("검색어 입력")
-            },
+            }
+        }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 12.dp,
-                    vertical = 8.dp
-                )
-        ) // Search TextField
-
-        Spacer(
-            modifier = Modifier
-                .height(8.dp)
-        )
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 8.dp, end = 8.dp
-                )
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(color = Color.White),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(search.itemCount) { index ->
-                search[index]?.let {
-                    ImageCard(
-                        imageUrl = it.imageUrl,
-                        tileStamp = it.timestamp,
-                        isSavedImage = it.isFavorite,
-                        onClick = {
-                            viewModel.toggleFavorite(it)
-                        }
+            OutlinedTextField(
+                value = keyword,
+                onValueChange = {
+                    keyword = it
+                },
+                singleLine = true,
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    color = Color.Black
+                ),
+                shape = RoundedCornerShape(
+                    corner = CornerSize(8.dp)
+                ),
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search Icon",
+                        tint = Color.LightGray,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable {
+                                viewModel
+                            }
                     )
+                },
+                label = {
+                    Text("검색어 입력")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 12.dp,
+                        vertical = 8.dp
+                    )
+            ) // Search TextField
+
+            Spacer(
+                modifier = Modifier
+                    .height(8.dp)
+            )
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = 8.dp, end = 8.dp
+                    )
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(search.itemCount) { index ->
+                    search[index]?.let {
+                        ImageCard(
+                            imageUrl = it.imageUrl,
+                            tileStamp = it.timestamp,
+                            isSavedImage = it.isFavorite,
+                            onClick = {
+                                viewModel.toggleFavorite(it)
+                            }
+                        )
+                    }
                 }
             }
         }

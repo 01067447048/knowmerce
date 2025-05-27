@@ -25,6 +25,7 @@ import com.morphine_coder.knowmerce.core.common.navigation.NavigationAction
 import com.morphine_coder.knowmerce.core.common.navigation.Navigator
 import com.morphine_coder.knowmerce.core.designsystem.snackbar.SnackBarController
 import com.morphine_coder.knowmerce.core.designsystem.utils.ObserveAsEvent
+import com.morphine_coder.knowmerce.feature.saved_list.FavoriteScreen
 import com.morphine_coder.knowmerce.feature.search.SearchScreen
 import com.morphine_coder.knowmerce.feature.search.SearchViewModel
 import com.morphine_coder.knowmerce.ui.theme.KnowmerceTheme
@@ -99,7 +100,11 @@ class MainActivity : ComponentActivity() {
                                 viewModel = hiltViewModel(navBackStackEntry)
                             )
                         }
-
+                        composable<Destination.FavoriteRoute> { navBackStackEntry ->
+                            FavoriteScreen(
+                                viewModel = hiltViewModel(navBackStackEntry)
+                            )
+                        }
                     }
                 }
             }

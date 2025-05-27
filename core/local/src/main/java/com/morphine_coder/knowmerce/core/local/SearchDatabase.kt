@@ -13,7 +13,7 @@ import com.morphine_coder.knowmerce.core.local.entity.SearchResultEntity
  */
 @Database(
     entities = [SearchResultEntity::class, FavoriteEntity::class],
-    version = 2
+    version = 1
 )
 abstract class SearchDatabase: RoomDatabase() {
 

@@ -1,5 +1,9 @@
 package com.morphine_coder.knowmerce.core.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.morphine_coder.knowmerce.core.domain.model.repository.FavoriteRepository
 import com.morphine_coder.knowmerce.core.local.SearchDatabase
 import com.morphine_coder.knowmerce.core.local.entity.FavoriteEntity
@@ -28,6 +32,29 @@ class FavoriteRepositoryImpl @Inject constructor(
                 FavoriteEntity(item.docUrl)
             )
         }
+    }
+
+    override fun getFavoritePaging(): Flow<PagingData<SearchResult>> {
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = {
+                database.favoriteDao().pagingFavorites()
+            }
+        ).flow.map { pagingData ->
+            pagingData.map { it.toModel() }
+        }
+    }
+
+    override suspend fun addFavorite(item: SearchResult) {
+        database.favoriteDao().insert(
+            FavoriteEntity(item.docUrl)
+        )
+    }
+
+    override suspend fun removeFavorite(item: SearchResult) {
+        database.favoriteDao().delete(
+            FavoriteEntity(item.docUrl)
+        )
     }
 
     override fun getFavorites(): Flow<List<SearchResult>> {

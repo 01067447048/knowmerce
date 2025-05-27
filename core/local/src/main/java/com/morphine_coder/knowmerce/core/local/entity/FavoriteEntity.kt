@@ -12,5 +12,6 @@ import com.morphine_coder.knowmerce.core.model.SearchResult
 @Entity(tableName = "favorites")
 data class FavoriteEntity(
     @PrimaryKey
-    val docUrl: String
+    val docUrl: String,
+    val addedAt: Long = System.currentTimeMillis()
 )

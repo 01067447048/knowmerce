@@ -12,5 +12,5 @@ sealed interface Destination {
     data object SearchRoute : Destination
 
     @Serializable
-    data object SavedListRoute : Destination
+    data object FavoriteRoute : Destination
 }
